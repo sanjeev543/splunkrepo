@@ -1,2 +1,2 @@
 # splunkrepo
-Regarding All Splunk 
+Regarding my personal Splunk project
