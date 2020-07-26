@@ -1,0 +1,42 @@
+Ingesting SNMP Traps in Splunk 
+==============================
+1)yum install net-snmp-utils net-snmp-libs net-snmp
+rpm -qa| grep snmp
+snmpconf -r none -i -g basic_setup
+systemctl enable snmptrapd
+
+snmptrapd -Lf /var/log/snmp-traps --disableAuthorization=yes
+
+vi /etc/sysconfig/snmptrapd
+
+OPTIONS="-c /etc/snmp/snmptrapd.conf -A -n -Lf /var/log/snmptrapd.log -OQ -m 
+ALL --disableAuthorization=yes -p /var/run/snmptrapd.pid"
+
+
+vi /etc/snmp/snmptrapd.conf 
+
+
+# snmptrapd formatting
+#http://www.net-snmp.org/wiki/index.php/TUT:Configuring_snmptrapd_to_parse_MIBS_from_3rd_party_Vendors
+# SNMPV1
+format1 Agent_Address = %A\nAgent_Hostname = %B\nDate = %y-%02.2m-%02.2l 
+%02.2h:%02.2j:%02.2k\nEnterprise_OID = %N \nTrap_Type = %w\nTrap_SubType = 
+%q\nCommunity_Infosec_Context = %P\nUptime = %T\nDescription = 
+%W\nPDU_Attribute_Value_Pair_Array:\n%V\n%v\n---\n
+# SNMPV2
+format2 Agent_Address = %A\nAgent_Hostname = %B\nDate = %y-%02.2m-%02.2l 
+%02.2h:%02.2j:%02.2k\nEnterprise_OID = %N\nTrap_Type = %w\nTrap_SubType = 
+%q\nCommunity_Infosec_Context = %P\nUptime = %T\nDescription = 
+%W\nPDU_Attribute_Value_Pair_Array:\n%V\n%v\n---\n
+
+
+format2 %V\n% Agent Address: %A \n Agent Hostname: %B \n Date: %H - %J - %K - %L - %M - %Y \n Enterprise OID: %N \n Trap Type: %W \n Trap Sub-Type: %q \n Community/Infosec Context: %P \n Uptime: %T \n Description: %W \n PDU Attribute/Value Pair Array:\n%v \n -------------- \n
+
+
+OPTIONS="-c /etc/snmp/snmptrapd.conf -A -n -Lf /var/log/snmptrapd.log -OQ -m ALL --disableAuthorization=yes -p /var/run/snmptrapd.pid"
+
+snmptrap -v 2c -c public 10.150.0.2 '' 1.3.6.1.4.1.8072.2.3.0.1 1.3.6.1.4.1.8072.2.3.2.1 i 123456
+
+http://net-snmp.sourceforge.net/wiki/index.php/TUT:Using_and_loading_MIBS
+
+snmptrap -v 2c -c public <destination_hostname> '' 1.3.6.1.4.1.8072.2.3.0.1 1.3.6.1.4.1.8072.2.3.2.1 i 123456
