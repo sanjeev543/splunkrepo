@@ -1,0 +1,32 @@
+Restore archived indexed data
+
+
+We can restore archived data by moving the archived bucket into  thawed directory (for example, $SPLUNK_HOME/var/lib/splunk/defaultdb/thaweddb) and then processing it. Data in thaweddb is not subject to the server's index aging scheme (hot > warm> cold > frozen). We  can put archived data in the thawed directory for as long as we need it. When the data is no longer needed, we can simply delete it or move it out of thawed.
+
+4.2+ buckets: You can restore a 4.2+ bucket to an indexer running any operating system.
+4.2+ buckets: You can restore a 4.2+ bucket to any 4.2+ instance.
+
+How to tell whether your archive bucket contains 4.2+ data  - The bucket directory contains only the rawdata directory, which contains journal.gz
+
+*nix users
+1. Copy your archive bucket into the thawed directory:
+
+cp -r db_1181756465_1162600547_1001 $SPLUNK_HOME/var/lib/splunk/defaultdb/thaweddb
+
+Note: The bucket id cannot conflict with any other bucket in the index. This example assumes that the bucket id '1001' is unique for the index. If it isn't, choose some other, non-conflicting bucket ID.
+
+2. Execute the splunk rebuild command on the archive bucket to rebuild the indexes and associated files:
+
+splunk rebuild $SPLUNK_HOME/var/lib/splunk/defaultdb/thaweddb/db_1181756465_1162600547_1001
+
+3. Restart the indexer:
+
+
+splunk restart 
+
+
+Clustered data thawing
+
+You can thaw archived clustered data onto individual peer nodes the same way that you thaw data onto any individual indexer. However, as described in "Archive indexed data", it is difficult to archive just a single copy of clustered data in the first place. If, instead, you archive data across all peer nodes in a cluster, you can later thaw the data, placing the data into the thawed directories of the peer nodes from which it was originally archived. You will end up with replication factor copies of the thawed data on your cluster, since you are thawing all of the original data, including the copies.
+
+Note: Data does not get replicated from the thawed directory. So, if you thaw just a single copy of some bucket, instead of all the copies, only that single copy will reside in the cluster, in the thawed directory of the peer node where you placed it.
