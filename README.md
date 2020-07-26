@@ -1,2 +1,2 @@
 # splunkrepo
-Regarding my personal Splunk project
+Splunk configuration & Installation Repository
