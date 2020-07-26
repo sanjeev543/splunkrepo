@@ -1,2 +1,2 @@
 # splunkrepo
-Splunk configuration & Installation Repository
+Splunk Installation & ConfigurationRepository
